@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.shradha.javajokes.Joker;
+import com.shradha.jokeactivity.JokeActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -42,7 +43,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tellJoke(View view) {
-        Toast.makeText(this, Joker.getJoke(), Toast.LENGTH_SHORT).show();
+        String joke = Joker.getJoke();
+
+        Toast.makeText(this, joke, Toast.LENGTH_SHORT).show();
+        startActivity(JokeActivity.createIntent(this, joke));
     }
 
 
