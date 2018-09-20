@@ -1,7 +1,5 @@
 package com.udacity.gradle.builditbigger;
 
-import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -9,16 +7,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.shradha.jokeactivity.JokeActivity;
-import com.udacity.gradle.builditbigger.backend.myApi.MyApi;
-
-import java.io.IOException;
-import java.lang.ref.WeakReference;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    private EndpointsAsyncTask.CompletionListener requestCompletionListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +20,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        requestCompletionListener = null;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -50,45 +49,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void tellJoke(View view) {
+        requestCompletionListener = result -> {
+            Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
+            startActivity(JokeActivity.createIntent(MainActivity.this, result));
+        };
 
-        new EndpointsAsyncTask().execute(this);
-    }
-
-    static class EndpointsAsyncTask extends AsyncTask<Context, Void, String> {
-        private static MyApi myApiService = null;
-        private WeakReference<Context> contextReference;
-
-        @Override
-        protected final String doInBackground(Context... params) {
-            if (myApiService == null) {  // Only do this once
-                MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
-                        new AndroidJsonFactory(), null)
-                        // options for running against local devappserver
-                        // - 10.0.2.2 is localhost's IP address in Android emulator
-                        // - turn off compression when running against local devappserver
-                        .setRootUrl("http://192.168.0.100:8077/_ah/api/")
-                        .setGoogleClientRequestInitializer(abstractGoogleClientRequest -> abstractGoogleClientRequest.setDisableGZipContent(true));
-                // end options for devappserver
-
-                myApiService = builder.build();
-            }
-
-            contextReference = new WeakReference<>(params[0]);
-
-            try {
-                return myApiService.getJoke().execute().getData();
-            } catch (IOException e) {
-                return e.getMessage();
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Context context = contextReference.get();
-            if (context == null) return;
-
-            Toast.makeText(context, result, Toast.LENGTH_LONG).show();
-            context.startActivity(JokeActivity.createIntent(context, result));
-        }
+        new EndpointsAsyncTask().execute(requestCompletionListener);
     }
 }
