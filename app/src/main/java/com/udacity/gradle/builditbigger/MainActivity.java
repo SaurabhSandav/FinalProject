@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.shradha.jokeactivity.JokeActivity;
@@ -18,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        findViewById(R.id.bt_tell_joke).setOnClickListener(v -> tellJoke());
     }
 
     @Override
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void tellJoke(View view) {
+    private void tellJoke() {
         requestCompletionListener = result -> {
             Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
             startActivity(JokeActivity.createIntent(MainActivity.this, result));
