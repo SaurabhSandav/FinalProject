@@ -20,3 +20,16 @@ allprojects {
         google()
     }
 }
+
+task runTestsWithGCE(dependsOn: [
+        ':backend:appengineStart',
+        ':app:connectedAndroidTest',
+        ':backend:appengineStop'
+]) {
+    group 'custom'
+    description 'Starts GCE, Runs tests, Exits GCE'
+
+    doLast {
+        println 'Task successful!'
+    }
+}
