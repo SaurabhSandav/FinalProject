@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void tellJoke() {
         requestCompletionListener = result -> {
-            Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(MainActivity.this, result, Toast.LENGTH_LONG).show();
             startActivity(JokeActivity.createIntent(MainActivity.this, result));
         };
 
